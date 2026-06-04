@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recursos | Lectura Viva Rural</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<header>
+  <div class="header-wrap">
+    <div class="logo"><span class="logo-badge">📚</span><span>Lectura Viva Rural</span></div>
+    <nav><a href="index.html" class="">Inicio</a><a href="actividades.html" class="">Actividades</a><a href="subir.html" class="">Subir resultado</a><a href="recursos.html" class="active">Recursos</a><a href="progreso.html" class="">Progreso</a></nav>
+  </div>
+</header>
+<main>
+
+<h1>🧺 Recursos compartidos</h1>
+<div class="notice">
+  <strong>Zona de recursos:</strong> aquí se visualizan los trabajos guardados en este navegador. Puedes ver, descargar, exportar o importar recursos.
+</div>
+
+<div class="form" style="margin-bottom:20px">
+  <label>Filtrar por actividad</label>
+  <select id="filtro-actividad"><option value="">Todas las actividades</option></select>
+
+  <div class="actions">
+    <button class="btn secondary" id="exportar">Exportar recursos JSON</button>
+    <label class="btn warning" for="importar" style="margin:0">Importar recursos JSON</label>
+    <input id="importar" type="file" accept=".json" style="display:none">
+    <button class="btn danger" id="limpiar">Limpiar navegador</button>
+  </div>
+</div>
+
+<section id="recursos-list"></section>
+
+</main>
+<script src="js/app.js"></script>
+</body>
+</html>

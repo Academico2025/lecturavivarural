@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subir resultado | Lectura Viva Rural</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<header>
+  <div class="header-wrap">
+    <div class="logo"><span class="logo-badge">📚</span><span>Lectura Viva Rural</span></div>
+    <nav><a href="index.html" class="">Inicio</a><a href="actividades.html" class="">Actividades</a><a href="subir.html" class="active">Subir resultado</a><a href="recursos.html" class="">Recursos</a><a href="progreso.html" class="">Progreso</a></nav>
+  </div>
+</header>
+<main>
+
+<h1>📤 Subir resultado de actividad</h1>
+<div class="notice warning-box">
+  <strong>Importante:</strong> en GitHub Pages la entrega queda guardada en este navegador. Usa la opción de exportar en Recursos para crear una copia reutilizable.
+</div>
+<form id="form-entrega-github" class="form">
+  <label>Nombre del estudiante o equipo</label>
+  <input id="estudiante" required placeholder="Ejemplo: Equipo Los Lectores del Campo">
+
+  <label>Actividad</label>
+  <select id="actividad" required></select>
+
+  <label>Tipo de evidencia</label>
+  <select id="tipo" required>
+    <option>Texto escrito</option>
+    <option>Imagen o fotografía</option>
+    <option>Audio</option>
+    <option>Video</option>
+    <option>Mapa o dibujo</option>
+    <option>Documento PDF</option>
+    <option>Documento Word</option>
+  </select>
+
+  <label>Descripción del resultado</label>
+  <textarea id="descripcion" placeholder="Cuenta qué hicieron, qué aprendieron y cómo se relaciona con la vereda o la comunidad."></textarea>
+
+  <label>Archivo de evidencia</label>
+  <input id="archivo" type="file" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.txt,.doc,.docx,.mp3,.mp4,.wav,.m4a">
+
+  <div class="actions">
+    <button class="btn" type="submit">Guardar resultado</button>
+    <a class="btn secondary" href="recursos.html">Ver recursos</a>
+  </div>
+</form>
+<div id="mensaje" style="margin-top:20px"></div>
+
+</main>
+<script src="js/app.js"></script>
+</body>
+</html>

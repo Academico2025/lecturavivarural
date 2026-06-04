@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "titulo": "Relatos de la vereda",
+    "descripcion": "Escribe y comparte un relato corto sobre tu vereda."
+  },
+  {
+    "id": 2,
+    "titulo": "Historias familiares",
+    "descripcion": "Entrevista a un familiar y resume su historia."
+  },
+  {
+    "id": 3,
+    "titulo": "Mapeo del territorio",
+    "descripcion": "Dibuja el mapa de tu territorio y describe lugares importantes."
+  },
+  {
+    "id": 4,
+    "titulo": "Cuentos colaborativos",
+    "descripcion": "Crea un cuento en equipo inspirado en la comunidad."
+  },
+  {
+    "id": 5,
+    "titulo": "Lectura de folletos locales",
+    "descripcion": "Lee folletos locales e identifica ideas principales."
+  },
+  {
+    "id": 6,
+    "titulo": "Diario de campo",
+    "descripcion": "Registra observaciones de plantas, animales o cultivos."
+  },
+  {
+    "id": 7,
+    "titulo": "Historias orales digitalizadas",
+    "descripcion": "Graba un relato oral y escribe un resumen."
+  },
+  {
+    "id": 8,
+    "titulo": "Inferencias del entorno",
+    "descripcion": "Observa imágenes del entorno e interpreta qué sucede."
+  },
+  {
+    "id": 9,
+    "titulo": "Caza de palabras locales",
+    "descripcion": "Busca palabras propias de la comunidad y explica su significado."
+  },
+  {
+    "id": 10,
+    "titulo": "Comparación de historias",
+    "descripcion": "Compara dos relatos y encuentra semejanzas y diferencias."
+  },
+  {
+    "id": 11,
+    "titulo": "Periódico escolar",
+    "descripcion": "Redacta noticias escolares o comunitarias."
+  },
+  {
+    "id": 12,
+    "titulo": "Juego de roles",
+    "descripcion": "Representa una situación de la vereda y escribe lo aprendido."
+  },
+  {
+    "id": 13,
+    "titulo": "Cartas a la comunidad",
+    "descripcion": "Escribe una carta dirigida a una persona de la comunidad."
+  },
+  {
+    "id": 14,
+    "titulo": "Historias con imágenes",
+    "descripcion": "Ordena imágenes y crea una historia con inicio, nudo y final."
+  },
+  {
+    "id": 15,
+    "titulo": "Lectura de recetas locales",
+    "descripcion": "Lee una receta tradicional e identifica pasos e instrucciones."
+  },
+  {
+    "id": 16,
+    "titulo": "Entrevistas offline",
+    "descripcion": "Realiza una entrevista y organiza las respuestas."
+  },
+  {
+    "id": 17,
+    "titulo": "Reflexión sobre problemas locales",
+    "descripcion": "Lee una situación del territorio y propone soluciones."
+  },
+  {
+    "id": 18,
+    "titulo": "Poesía de la vereda",
+    "descripcion": "Crea un poema inspirado en la naturaleza y la comunidad."
+  },
+  {
+    "id": 19,
+    "titulo": "Historias con elementos locales",
+    "descripcion": "Usa objetos o imágenes locales para inventar una historia."
+  },
+  {
+    "id": 20,
+    "titulo": "Libro de memorias de clase",
+    "descripcion": "Construye una memoria colectiva con textos de la clase."
+  }
+]
