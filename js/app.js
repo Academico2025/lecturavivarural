@@ -1,18 +1,29 @@
 
-const DB_NAME = "lectura_viva_rural_db";
-const STORE = "entregas";
-const DB_VERSION = 1;
-
+const FALLBACK_ACTIVIDADES = [{"id": 1, "titulo": "Relatos de la vereda", "descripcion": "Escribe y comparte un relato corto sobre tu vereda."}, {"id": 2, "titulo": "Historias familiares", "descripcion": "Entrevista a un familiar y resume su historia."}, {"id": 3, "titulo": "Mapeo del territorio", "descripcion": "Dibuja el mapa de tu territorio y describe lugares importantes."}, {"id": 4, "titulo": "Cuentos colaborativos", "descripcion": "Crea un cuento en equipo inspirado en la comunidad."}, {"id": 5, "titulo": "Lectura de folletos locales", "descripcion": "Lee folletos locales e identifica ideas principales."}, {"id": 6, "titulo": "Diario de campo", "descripcion": "Registra observaciones de plantas, animales o cultivos."}, {"id": 7, "titulo": "Historias orales digitalizadas", "descripcion": "Graba un relato oral y escribe un resumen."}, {"id": 8, "titulo": "Inferencias del entorno", "descripcion": "Observa imágenes del entorno e interpreta qué sucede."}, {"id": 9, "titulo": "Caza de palabras locales", "descripcion": "Busca palabras propias de la comunidad y explica su significado."}, {"id": 10, "titulo": "Comparación de historias", "descripcion": "Compara dos relatos y encuentra semejanzas y diferencias."}, {"id": 11, "titulo": "Periódico escolar", "descripcion": "Redacta noticias escolares o comunitarias."}, {"id": 12, "titulo": "Juego de roles", "descripcion": "Representa una situación de la vereda y escribe lo aprendido."}, {"id": 13, "titulo": "Cartas a la comunidad", "descripcion": "Escribe una carta dirigida a una persona de la comunidad."}, {"id": 14, "titulo": "Historias con imágenes", "descripcion": "Ordena imágenes y crea una historia con inicio, nudo y final."}, {"id": 15, "titulo": "Lectura de recetas locales", "descripcion": "Lee una receta tradicional e identifica pasos e instrucciones."}, {"id": 16, "titulo": "Entrevistas offline", "descripcion": "Realiza una entrevista y organiza las respuestas."}, {"id": 17, "titulo": "Reflexión sobre problemas locales", "descripcion": "Lee una situación del territorio y propone soluciones."}, {"id": 18, "titulo": "Poesía de la vereda", "descripcion": "Crea un poema inspirado en la naturaleza y la comunidad."}, {"id": 19, "titulo": "Historias con elementos locales", "descripcion": "Usa objetos o imágenes locales para inventar una historia."}, {"id": 20, "titulo": "Libro de memorias de clase", "descripcion": "Construye una memoria colectiva con textos de la clase."}];
 const emojis = ["🌱","👨‍👩‍👧","🗺️","📚","📰","🌿","🎙️","🖼️","🔎","⚖️","🗞️","🎭","✉️","📷","🍲","🗣️","💧","🌻","🧺","📖"];
-function emojiFor(id){ return emojis[Number(id)-1] || "⭐"; }
+const DB_NAME = "LecturaVivaRuralDB";
+const STORE = "entregas";
+let actividadesCache = [];
+
+function emojiFor(id){ return emojis[id-1] || "⭐"; }
+
+async function getJSON(url, fallback=[]){
+  try{
+    const r = await fetch(url + "?v=" + Date.now());
+    if(!r.ok) return fallback;
+    return await r.json();
+  }catch(e){
+    return fallback;
+  }
+}
 
 function openDB(){
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
+  return new Promise((resolve, reject)=>{
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
       if(!db.objectStoreNames.contains(STORE)){
-        db.createObjectStore(STORE, { keyPath: "id" });
+        db.createObjectStore(STORE, {keyPath:"id"});
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -22,88 +33,72 @@ function openDB(){
 
 async function addEntrega(entrega){
   const db = await openDB();
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject)=>{
     const tx = db.transaction(STORE, "readwrite");
     tx.objectStore(STORE).put(entrega);
-    tx.oncomplete = () => resolve(true);
+    tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
 }
 
 async function getEntregas(){
   const db = await openDB();
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject)=>{
     const tx = db.transaction(STORE, "readonly");
-    const request = tx.objectStore(STORE).getAll();
-    request.onsuccess = () => resolve(request.result.sort((a,b) => b.id - a.id));
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function clearEntregas(){
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).clear();
-    tx.oncomplete = () => resolve(true);
-    tx.onerror = () => reject(tx.error);
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => resolve(req.result.sort((a,b)=>b.id-a.id));
+    req.onerror = () => reject(req.error);
   });
 }
 
 async function deleteEntrega(id){
   const db = await openDB();
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject)=>{
     const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).delete(Number(id));
-    tx.oncomplete = () => resolve(true);
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
 }
 
-async function getActividades(){
-  try{
-    const r = await fetch("data/actividades.json");
-    if(!r.ok) throw new Error("No se pudo cargar actividades.json");
-    return await r.json();
-  }catch(e){
-    return [];
-  }
-}
-
-function readFileAsDataURL(file){
-  return new Promise((resolve, reject) => {
-    if(!file) return resolve({nombre:"Sin archivo", tipo:"", dataUrl:""});
-    const reader = new FileReader();
-    reader.onload = () => resolve({nombre:file.name, tipo:file.type, dataUrl:reader.result});
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
+async function clearEntregas(){
+  const db = await openDB();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
   });
 }
 
+async function initCommon(){
+  actividadesCache = await getJSON("data/actividades.json", FALLBACK_ACTIVIDADES);
+  if(!Array.isArray(actividadesCache) || actividadesCache.length === 0){
+    actividadesCache = FALLBACK_ACTIVIDADES;
+  }
+}
+
 async function renderStats(){
-  const actividades = await getActividades();
+  const el = document.getElementById("stat-completadas");
+  if(!el) return;
   const entregas = await getEntregas();
-  const completadas = new Set(entregas.map(e => String(e.actividad_id))).size;
-  const s1 = document.getElementById("stat-completadas");
-  const s2 = document.getElementById("stat-pendientes");
-  const s3 = document.getElementById("stat-recursos");
-  if(s1) s1.textContent = completadas;
-  if(s2) s2.textContent = Math.max(0, actividades.length - completadas);
-  if(s3) s3.textContent = entregas.length;
+  const completadas = new Set(entregas.map(e=>String(e.actividad_id))).size;
+  document.getElementById("stat-completadas").textContent = completadas;
+  document.getElementById("stat-pendientes").textContent = Math.max(0, actividadesCache.length - completadas);
+  document.getElementById("stat-recursos").textContent = entregas.length;
 }
 
 async function renderActividades(){
   const box = document.getElementById("actividades-grid");
   if(!box) return;
-  const actividades = await getActividades();
   const entregas = await getEntregas();
-  const hechas = new Set(entregas.map(e => String(e.actividad_id)));
-  box.innerHTML = actividades.map(a => `
+  const hechas = new Set(entregas.map(e=>String(e.actividad_id)));
+  box.innerHTML = actividadesCache.map(a => `
     <article class="card activity-card">
       <span class="badge">Actividad ${a.id}</span>
       <h3>${emojiFor(a.id)} ${a.titulo}</h3>
       <p>${a.descripcion}</p>
-      <p class="small"><strong>Estado en este navegador:</strong> ${hechas.has(String(a.id)) ? "Completada" : "Pendiente"}</p>
+      <p class="small"><strong>Estado:</strong> ${hechas.has(String(a.id)) ? "Completada" : "Pendiente"}</p>
       <a class="btn secondary" href="subir.html?actividad=${a.id}">Subir resultado</a>
     </article>
   `).join("");
@@ -111,26 +106,22 @@ async function renderActividades(){
 
 async function initSubir(){
   const select = document.getElementById("actividad");
-  const form = document.getElementById("form-entrega-github");
-  if(!select || !form) return;
-
-  const actividades = await getActividades();
-  actividades.forEach(a => {
-    const opt = document.createElement("option");
-    opt.value = a.id;
-    opt.textContent = `${a.id}. ${a.titulo}`;
+  if(!select) return;
+  select.innerHTML = "";
+  actividadesCache.forEach(a=>{
+    const opt=document.createElement("option");
+    opt.value=a.id;
+    opt.textContent=`${a.id}. ${a.titulo}`;
     select.appendChild(opt);
   });
-
   const params = new URLSearchParams(window.location.search);
   if(params.get("actividad")) select.value = params.get("actividad");
 
-  form.addEventListener("submit", async (e) => {
+  const form = document.getElementById("form-entrega");
+  form.addEventListener("submit", async (e)=>{
     e.preventDefault();
-    const file = document.getElementById("archivo").files[0];
-    const actividad = actividades.find(a => String(a.id) === String(select.value));
-    const archivo = await readFileAsDataURL(file);
-
+    const file = document.getElementById("archivo").files[0] || null;
+    const actividad = actividadesCache.find(a => String(a.id) === String(select.value));
     const entrega = {
       id: Date.now(),
       estudiante: document.getElementById("estudiante").value.trim(),
@@ -138,142 +129,151 @@ async function initSubir(){
       actividad_titulo: actividad ? actividad.titulo : "Actividad",
       tipo: document.getElementById("tipo").value,
       descripcion: document.getElementById("descripcion").value.trim(),
-      archivo_nombre: archivo.nombre,
-      archivo_tipo: archivo.tipo,
-      archivo_data_url: archivo.dataUrl,
-      fecha: new Date().toLocaleString()
+      fecha: new Date().toLocaleString(),
+      archivoNombre: file ? file.name : "",
+      archivoTipo: file ? file.type : "",
+      archivoBlob: file
     };
-
     await addEntrega(entrega);
-    document.getElementById("mensaje").innerHTML = `
-      <div class="notice">
-        <strong>✅ Resultado guardado en este navegador.</strong><br>
-        Para compartirlo con otro computador, usa la opción <strong>Exportar recursos</strong> en la página Recursos.
-      </div>`;
+    document.getElementById("mensaje").innerHTML = `<div class="notice"><strong>✅ Resultado guardado.</strong><br>Ahora puedes verlo en la pestaña Recursos.</div>`;
     form.reset();
   });
 }
 
 function makePreview(e){
-  const data = e.archivo_data_url || "";
-  const name = e.archivo_nombre || "";
-  if(!data) return `<div class="icon">${emojiFor(e.actividad_id)}</div>`;
-  if((e.archivo_tipo || "").startsWith("image/")) return `<img class="preview" src="${data}" alt="Vista previa">`;
-  if((e.archivo_tipo || "").startsWith("audio/")) return `<audio controls src="${data}" style="max-width:220px"></audio>`;
-  if((e.archivo_tipo || "").startsWith("video/")) return `<video controls src="${data}" class="preview"></video>`;
-  if(/\.pdf$/i.test(name)) return `<div class="icon">📄</div>`;
+  if(!e.archivoBlob) return `<div class="icon">${emojiFor(Number(e.actividad_id))}</div>`;
+  const url = URL.createObjectURL(e.archivoBlob);
+  const type = e.archivoTipo || "";
+  if(type.startsWith("image/")) return `<img class="preview" src="${url}" alt="Vista previa">`;
+  if(type.startsWith("audio/")) return `<audio controls src="${url}"></audio>`;
+  if(type.startsWith("video/")) return `<video class="preview" controls src="${url}"></video>`;
+  if(type === "application/pdf") return `<div class="icon">📄</div>`;
   return `<div class="icon">📎</div>`;
 }
 
 async function renderRecursos(){
   const list = document.getElementById("recursos-list");
+  if(!list) return;
   const filtro = document.getElementById("filtro-actividad");
-  if(!list || !filtro) return;
-
-  const actividades = await getActividades();
-  actividades.forEach(a => {
-    const opt = document.createElement("option");
-    opt.value = a.id;
-    opt.textContent = `${a.id}. ${a.titulo}`;
+  filtro.innerHTML = `<option value="">Todas las actividades</option>`;
+  actividadesCache.forEach(a=>{
+    const opt=document.createElement("option");
+    opt.value=a.id;
+    opt.textContent=`${a.id}. ${a.titulo}`;
     filtro.appendChild(opt);
   });
-
   async function paint(){
     const selected = filtro.value;
     const entregas = (await getEntregas()).filter(e => !selected || String(e.actividad_id) === String(selected));
     if(entregas.length === 0){
-      list.innerHTML = `<div class="card"><h3>📭 Aún no hay recursos</h3><p>Cuando los estudiantes suban resultados desde este navegador, aparecerán aquí.</p></div>`;
+      list.innerHTML = `<div class="card"><h3>📭 Aún no hay recursos</h3><p>Cuando subas resultados desde esta app, aparecerán aquí.</p></div>`;
       return;
     }
-
-    list.innerHTML = entregas.map(e => `
-      <div class="resource">
+    list.innerHTML = entregas.map(e=>{
+      const url = e.archivoBlob ? URL.createObjectURL(e.archivoBlob) : "";
+      return `<div class="resource">
         ${makePreview(e)}
         <div>
           <strong>${e.actividad_titulo}</strong>
           <div class="small">Estudiante/equipo: ${e.estudiante} · Tipo: ${e.tipo} · Fecha: ${e.fecha}</div>
           <p>${e.descripcion || "Sin descripción adicional."}</p>
-          <div class="small">Archivo: ${e.archivo_nombre || "Sin archivo"}</div>
+          <div class="small">Archivo: ${e.archivoNombre || "Sin archivo adjunto"}</div>
         </div>
         <div class="actions" style="margin:0">
-          ${e.archivo_data_url ? `<a class="btn" href="${e.archivo_data_url}" target="_blank">Ver</a><a class="btn secondary" href="${e.archivo_data_url}" download="${e.archivo_nombre}">Descargar</a>` : ""}
-          <button class="btn danger" data-delete="${e.id}">Eliminar</button>
+          ${url ? `<a class="btn" href="${url}" target="_blank">Ver</a><a class="btn secondary" href="${url}" download="${e.archivoNombre}">Descargar</a>` : ""}
+          <button class="btn danger" onclick="borrarEntrega(${e.id})">Eliminar</button>
         </div>
-      </div>
-    `).join("");
-
-    list.querySelectorAll("[data-delete]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        await deleteEntrega(btn.dataset.delete);
-        paint();
-        renderStats();
-      });
-    });
+      </div>`;
+    }).join("");
   }
-
   filtro.addEventListener("change", paint);
   paint();
+
+  const clearBtn = document.getElementById("borrar-todo");
+  if(clearBtn) clearBtn.addEventListener("click", async ()=>{
+    if(confirm("¿Deseas borrar todas las entregas guardadas en este navegador?")){
+      await clearEntregas();
+      location.reload();
+    }
+  });
+}
+
+async function borrarEntrega(id){
+  await deleteEntrega(id);
+  location.reload();
+}
+
+async function renderPublicos(){
+  const box = document.getElementById("recursos-publicos");
+  if(!box) return;
+  const publicos = await getJSON("data/recursos_publicos.json", []);
+  const visibles = publicos.filter(r => r.archivo && r.archivo.trim() !== "");
+  if(visibles.length === 0){
+    box.innerHTML = `<div class="card"><h3>📁 Biblioteca institucional vacía</h3><p>Para publicar recursos para todos, sube archivos a <strong>recursos_publicos/</strong> y registra cada uno en <strong>data/recursos_publicos.json</strong>.</p></div>`;
+    return;
+  }
+  box.innerHTML = visibles.map(r=>{
+    const ruta = "recursos_publicos/" + r.archivo;
+    const img = /\.(jpg|jpeg|png|gif|webp)$/i.test(r.archivo);
+    const preview = img ? `<img class="preview" src="${ruta}" alt="Vista previa">` : `<div class="icon">📁</div>`;
+    return `<div class="resource">
+      ${preview}
+      <div><strong>${r.titulo}</strong><div class="small">${r.actividad_titulo || "Recurso institucional"} · ${r.tipo || "Archivo"}</div><p>${r.descripcion || ""}</p></div>
+      <div class="actions" style="margin:0"><a class="btn" href="${ruta}" target="_blank">Ver</a><a class="btn secondary" href="${ruta}" download>Descargar</a></div>
+    </div>`;
+  }).join("");
+}
+
+function initTabs(){
+  const localBtn = document.getElementById("tab-local");
+  const publicBtn = document.getElementById("tab-publicos");
+  if(!localBtn) return;
+  const local = document.getElementById("panel-local");
+  const publ = document.getElementById("panel-publicos");
+  localBtn.addEventListener("click", ()=>{
+    localBtn.classList.add("active"); publicBtn.classList.remove("active");
+    local.classList.remove("hidden"); publ.classList.add("hidden");
+  });
+  publicBtn.addEventListener("click", ()=>{
+    publicBtn.classList.add("active"); localBtn.classList.remove("active");
+    publ.classList.remove("hidden"); local.classList.add("hidden");
+  });
 }
 
 async function renderPerfil(){
   const tbody = document.getElementById("tabla-progreso");
   if(!tbody) return;
-  const actividades = await getActividades();
   const entregas = await getEntregas();
-  tbody.innerHTML = actividades.map(a => {
+  tbody.innerHTML = actividadesCache.map(a=>{
     const item = entregas.find(e => String(e.actividad_id) === String(a.id));
-    return `<tr>
-      <td>${a.id}</td>
-      <td>${a.titulo}</td>
-      <td>${item ? "Completada" : "Pendiente"}</td>
-      <td>${item ? item.fecha : "—"}</td>
-    </tr>`;
+    return `<tr><td>${a.id}</td><td>${a.titulo}</td><td>${item ? "Completada" : "Pendiente"}</td><td>${item ? item.fecha : "—"}</td></tr>`;
   }).join("");
 }
 
-async function initExportImport(){
-  const exportBtn = document.getElementById("exportar");
-  const importInput = document.getElementById("importar");
-  const clearBtn = document.getElementById("limpiar");
-  if(exportBtn){
-    exportBtn.addEventListener("click", async () => {
-      const entregas = await getEntregas();
-      const blob = new Blob([JSON.stringify(entregas, null, 2)], {type:"application/json"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "recursos_lectura_viva_rural.json";
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  }
-  if(importInput){
-    importInput.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if(!file) return;
-      const text = await file.text();
-      const data = JSON.parse(text);
-      for(const item of data){
-        await addEntrega(item);
-      }
-      location.reload();
-    });
-  }
-  if(clearBtn){
-    clearBtn.addEventListener("click", async () => {
-      if(confirm("¿Seguro que deseas borrar los recursos guardados en este navegador?")){
-        await clearEntregas();
-        location.reload();
-      }
-    });
-  }
+async function exportarJSON(){
+  const entregas = await getEntregas();
+  const sinArchivos = entregas.map(e => ({
+    id:e.id, estudiante:e.estudiante, actividad_id:e.actividad_id, actividad_titulo:e.actividad_titulo,
+    tipo:e.tipo, descripcion:e.descripcion, fecha:e.fecha, archivoNombre:e.archivoNombre, archivoTipo:e.archivoTipo
+  }));
+  const blob = new Blob([JSON.stringify(sinArchivos, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "entregas_lectura_viva_rural.json";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderStats();
-  renderActividades();
-  initSubir();
-  renderRecursos();
-  renderPerfil();
-  initExportImport();
+document.addEventListener("DOMContentLoaded", async ()=>{
+  await initCommon();
+  await renderStats();
+  await renderActividades();
+  await initSubir();
+  await renderRecursos();
+  await renderPublicos();
+  await renderPerfil();
+  initTabs();
+  const exportBtn = document.getElementById("exportar-json");
+  if(exportBtn) exportBtn.addEventListener("click", exportarJSON);
 });

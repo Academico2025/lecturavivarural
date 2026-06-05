@@ -7,36 +7,22 @@
 <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-<header>
-  <div class="header-wrap">
-    <div class="logo"><span class="logo-badge">📚</span><span>Lectura Viva Rural</span></div>
-    <nav><a href="index.html" class="active">Inicio</a><a href="actividades.html" class="">Actividades</a><a href="subir.html" class="">Subir resultado</a><a href="recursos.html" class="">Recursos</a><a href="progreso.html" class="">Progreso</a></nav>
-  </div>
-</header>
+<header><div class="header-wrap"><div class="logo"><span class="logo-badge">📚</span><span>Lectura Viva Rural</span></div><nav><a class="active" href="index.html">Inicio</a><a class="" href="actividades.html">Actividades</a><a class="" href="subir.html">Subir resultado</a><a class="" href="recursos.html">Recursos</a><a class="" href="progreso.html">Progreso</a><a href="ejemplo_actividades.html">Ejemplo de actividades</a></nav></div></header>
 <main>
-
 <section class="hero">
   <div>
-    <h1>Lee, crea y comparte saberes del territorio</h1>
-    <p>Permite trabajar actividades de comprensión lectora con recursos digitales, evidencias y materiales reutilizables guardados en el navegador.</p>
-    <div class="actions">
-      <a class="btn" href="actividades.html">Ver actividades</a>
-      <a class="btn secondary" href="subir.html">Subir resultado</a>
-    </div>
+    <h1>Lectura, territorio y saberes comunitarios</h1>
+    <p>App HTML para consultar las 20 actividades, subir evidencias en el navegador y organizar recursos reutilizables.</p>
+    <div class="actions"><a class="btn" href="actividades.html">Ver actividades</a><a class="btn secondary" href="subir.html">Subir resultado</a></div>
   </div>
   <div class="hero-art">🌿📖</div>
 </section>
-
 <section class="grid">
-  <article class="card stat"><div class="icon">✅</div><div><h3 id="stat-completadas">0</h3><p>Actividades con entregas</p></div></article>
+  <article class="card stat"><div class="icon">✅</div><div><h3 id="stat-completadas">0</h3><p>Actividades con entregas locales</p></div></article>
   <article class="card stat"><div class="icon">⏳</div><div><h3 id="stat-pendientes">20</h3><p>Actividades pendientes</p></div></article>
   <article class="card stat"><div class="icon">🧺</div><div><h3 id="stat-recursos">0</h3><p>Recursos guardados</p></div></article>
 </section>
-
-<div class="notice warning-box">
-  <strong>Modo GitHub Pages:</strong> esta versión no usa PHP ni servidor. Los recursos se guardan en el navegador mediante IndexedDB. Para compartirlos entre computadores, exporta el archivo JSON desde Recursos e impórtalo en otro equipo.
-</div>
-
+<div class="notice"><strong>Nota:</strong> esta versión funciona en GitHub Pages y también abierta directamente. Los 20 recuadros se cargan desde una lista interna de respaldo si el navegador bloquea el archivo JSON.</div>
 </main>
 <script src="js/app.js"></script>
 </body>
